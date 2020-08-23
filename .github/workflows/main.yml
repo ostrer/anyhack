@@ -14,5 +14,4 @@ jobs:
         submodule_update: OFF
         run_tests: OFF
         config: Release
-        package_generator:DEB
-        
+        package_generator: DEB
