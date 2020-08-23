@@ -23,5 +23,5 @@ jobs:
       with:
         cmakeGenerator: 'Ninja'  
         cmakeBuildType: 'Release'
-        buildWithCMakeArgs: 'package'
+        buildWithCMakeArgs: '--target package'
         buildDirectory: "${{ github.workspace }}/build"
