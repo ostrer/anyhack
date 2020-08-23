@@ -4,7 +4,17 @@ on: [push]
 
 jobs:
   ubuntu-build:
-    runs-on: ubuntu-latest
+    name: ${{matrix.buildname}}
+    runs-on: ${{matrix.os}}
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ubuntu-latest]
+        include:
+          - os: ubuntu-latest
+            buildname: 'ubuntu'
+            triplet: x64-linux
+            compiler: gcc_64
     steps:
     - name: Checkout
       uses: actions/checkout@v2.0.0
