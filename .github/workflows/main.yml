@@ -9,9 +9,9 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2.0.0
     - name: Build project
-      uses: nicledomaS/cmake_build_action@v1
+      uses: lukka/run-cmake@v0.10
       with:
-        submodule_update: OFF
-        run_tests: OFF
-        config: Release
-        package_generator: DEB
+        cmakeGenerator: 'Ninja'  
+        cmakeBuildType: 'Release'
+        buildWithCMakeArgs: 'package'
+        buildDirectory: "${{ github.workspace }}/build"
