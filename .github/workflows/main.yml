@@ -19,7 +19,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
     - name: Build project
-      uses: lukka/run-cmake@v0.10
+      uses: lukka/run-cmake@v2
       with:
         cmakeGenerator: 'Ninja'  
         cmakeBuildType: 'Release'
