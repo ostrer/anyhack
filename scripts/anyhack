@@ -1,0 +1,29 @@
+#! /bin/bash
+
+
+die() {
+    echo "$@" >&2
+    exit 1
+}
+[ "$(id -u)" -ne 0 ] && die "You must be root to run this script!" 
+
+ANYLINK=$(ip -o link show  | awk -F': ' '$2~/^cscotun/{print $2}')
+[ "X${ANYLINK}" = "X" ] && die "CISCO Tunnel interface not found. VPN is down?"
+ANYNET=$(ip -o -4 addr show dev ${ANYLINK} | awk '{print $4}')
+[ "X${ANYNET}" = "X" ] && die "Can't find ${ANYLINK} IP/Subnet"
+ANYMASK=${ANYNET#*/}
+ANYIP=${ANYNET%/*}
+[ "${ANYIP}" = "${ANYNET}" ] && die "Can't find ${ANYLINK} IP"
+
+
+set -e
+echo "Fixing IPTABLES"
+iptables-save | grep -v "^-A ciscovpn .* DROP$" | iptables-restore
+
+echo "Removing LAN route redirects to cisco"
+ip -o route show dev ${ANYLINK} | grep -e ^[1-9] | grep -v "src ${ANYIP}" | while read S ; do
+    echo " * Found redirected local route $S"
+    set $S
+    echo "     --> ip route del $1 dev ${ANYLINK}"
+    ip route del $1 dev ${ANYLINK}
+done
