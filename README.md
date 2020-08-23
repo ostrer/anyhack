@@ -4,4 +4,4 @@ Library replaces a method `CInterfaceRouteMonitorLinux::routeCallbackHandler()` 
 As result AnyConnect will not redirect the LAN route back to a cisco tun interface.
 Installation will add `LD_LIBRARY_PRELOAD` to a `vpnagentd`. After package installation finished, please re-establish VPN connection.
 When AnyConnect established the connection in order to allow "LAN" access just execute an `sudo anyhack` script.
-To restore policies - reconnect VPN.
+To restore the policies - reconnect VPN.
