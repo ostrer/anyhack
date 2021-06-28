@@ -1,25 +1,41 @@
 #! /bin/bash
 ANYCONNECT="/opt/cisco/anyconnect"
-[ ! -f /etc/init.d/vpnagentd.anyhackbak ] && cp /etc/init.d/vpnagentd /etc/init.d/vpnagentd.anyhackbak
 
-TMPBAK=$(mktemp -q /tmp/vpnagent.XXXXX)
-[ -z "${TMPBAK}" ] && {
-    echo "Failed to create temp file" >2&
-    exit 1
+setTmp() {
+	TMPBAK=$(mktemp -q /tmp/vpnagent.XXXXX)
+	[ -z "${TMPBAK}" ] && {
+	    echo "Failed to create temp file" >2&
+	    exit 1
+	}
 }
 
-set -e
+restartAgent() {
+	if diff -q ${RUNF} ${TMPBAK} ; then
+	    echo "No patch applied to /etc/init.d/vpnagentd" 2>&1
+	else
+	    cat ${TMPBAK} >  ${RUNF}
+	    echo "Restarting VPNAGENTD" 2>&1
+	    systemctl daemon-reload
+	    systemctl restart vpnagentd
+	fi
+	rm -f ${TMPBAK}
+}
 
-sed "s+^\([ \t]*\)$ANYCONNECT/bin/vpnagentd+\1LD_PRELOAD=$ANYCONNECT/lib/libanyhack.so.1 $ANYCONNECT/bin/vpnagentd+" /etc/init.d/vpnagentd > ${TMPBAK}
-
-if diff -q /etc/init.d/vpnagentd  ${TMPBAK} ; then
-    echo "No patch applied to /etc/init.d/vpnagentd" 2>&1
-else
-    cat ${TMPBAK} > /etc/init.d/vpnagentd
-    echo "Restarting VPNAGENTD" 2>&1
-    systemctl daemon-reload
-    systemctl restart vpnagentd
+RUNF=/etc/init.d/vpnagentd
+if [ -f /etc/init.d/vpnagentd ] ; then
+	[ ! -f ${RUNF}.anyhackbak ] && cp ${RUNF} ${RUNF}.anyhackbak
+	setTmp
+	set -e
+	sed "s+^\([ \t]*\)$ANYCONNECT/bin/vpnagentd+\1LD_PRELOAD=$ANYCONNECT/lib/libanyhack.so.1 $ANYCONNECT/bin/vpnagentd+"  ${RUNF} > ${TMPBAK}
+	restartAgent
 fi
-rm -f ${TMPBAK}
+RUNF=/etc/systemd/system/vpnagentd.service 
+if [ -f ${RUNF} ] ; then
+	grep -q LD_PRELOAD= /etc/systemd/system/vpnagentd.service || {
+		setTmp
+		sed "/^\[Service\]/a Environment=\"LD_PRELOAD=$ANYCONNECT/lib/libanyhack.so.1\"" ${RUNF} > ${TMPBAK}
+		restartAgent
+	}
+fi
 
 exit 0

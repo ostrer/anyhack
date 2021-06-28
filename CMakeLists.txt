@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.9)
 
-project(anyhack VERSION 0.1.0 DESCRIPTION "AnyConnect LAN hack")
+project(anyhack VERSION 0.2.0 DESCRIPTION "AnyConnect LAN hack")
 
 
 file(GLOB SOURCES src/*.c*)
