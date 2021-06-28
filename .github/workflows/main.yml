@@ -25,3 +25,8 @@ jobs:
         cmakeBuildType: 'Release'
         buildWithCMakeArgs: '--target package'
         buildDirectory: "${{ github.workspace }}/build"
+    - name: 'Upload Artifact'
+      uses: actions/upload-artifact@v2
+      with:
+        name: debpkg
+        path: "${{ github.workspace }}/build/anyhack_*.deb"
