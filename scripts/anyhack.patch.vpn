@@ -3,10 +3,10 @@ ANYCONNECT="/opt/cisco/anyconnect"
 
 setTmp() {
 	TMPBAK=$(mktemp -q /tmp/vpnagent.XXXXX)
-	[ -z "${TMPBAK}" ] && {
+	if [ -z "${TMPBAK}" ] ; then
 	    echo "Failed to create temp file" >2&
 	    exit 1
-	}
+	fi
 }
 
 restartAgent() {
