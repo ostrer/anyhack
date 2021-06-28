@@ -21,11 +21,12 @@ restartAgent() {
 	rm -f ${TMPBAK}
 }
 
+set -e
 RUNF=/etc/init.d/vpnagentd
 if [ -f /etc/init.d/vpnagentd ] ; then
 	[ ! -f ${RUNF}.anyhackbak ] && cp ${RUNF} ${RUNF}.anyhackbak
 	setTmp
-	set -e
+
 	sed "s+^\([ \t]*\)$ANYCONNECT/bin/vpnagentd+\1LD_PRELOAD=$ANYCONNECT/lib/libanyhack.so.1 $ANYCONNECT/bin/vpnagentd+"  ${RUNF} > ${TMPBAK}
 	restartAgent
 fi
@@ -38,4 +39,11 @@ if [ -f ${RUNF} ] ; then
 	}
 fi
 
+LFILE=/usr/share/applications/cisco-anyconnect.desktop
+if [ -f ${LFILE} ] ; then
+	grep -q ^Exec=env ${LFILE} || {
+		[ ! -f ${LFILE}.sav ] && cp ${LFILE} ${LFILE}.sav
+		sed -i 's@^\(Exec=\)\(.*vpnui\)@\1env https_proxy=\\"\\" HTTPS_PROXY=\"\" \2@' ${LFILE}
+	}
+fi
 exit 0
