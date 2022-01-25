@@ -43,7 +43,7 @@ LFILE=/usr/share/applications/cisco-anyconnect.desktop
 if [ -f ${LFILE} ] ; then
 	grep -q ^Exec=env ${LFILE} || {
 		[ ! -f ${LFILE}.sav ] && cp ${LFILE} ${LFILE}.sav
-		sed -i 's@^\(Exec=\)\(.*vpnui\)@\1env https_proxy=\\"\\" HTTPS_PROXY=\"\" \2@' ${LFILE}
+		sed -i 's@^\(Exec=\)\(.*vpnui\)@\1env https_proxy=\\"\\" HTTPS_PROXY=\\"\\" \2@' ${LFILE}
 	}
 fi
 exit 0
