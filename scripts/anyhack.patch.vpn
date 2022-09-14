@@ -27,14 +27,14 @@ if [ -f /etc/init.d/vpnagentd ] ; then
 	[ ! -f ${RUNF}.anyhackbak ] && cp ${RUNF} ${RUNF}.anyhackbak
 	setTmp
 
-	sed "s+^\([ \t]*\)$ANYCONNECT/bin/vpnagentd+\1LD_PRELOAD=$ANYCONNECT/lib/libanyhack.so.1 $ANYCONNECT/bin/vpnagentd+"  ${RUNF} > ${TMPBAK}
+	sed "s+^\([ \t]*\)$ANYCONNECT/bin/vpnagentd+\1LD_PRELOAD=/usr/local/lib/libanyhack.so.1 $ANYCONNECT/bin/vpnagentd+"  ${RUNF} > ${TMPBAK}
 	restartAgent
 fi
 RUNF=/etc/systemd/system/vpnagentd.service 
 if [ -f ${RUNF} ] ; then
 	grep -q LD_PRELOAD= /etc/systemd/system/vpnagentd.service || {
 		setTmp
-		sed "/^\[Service\]/a Environment=\"LD_PRELOAD=$ANYCONNECT/lib/libanyhack.so.1\"" ${RUNF} > ${TMPBAK}
+		sed "/^\[Service\]/a Environment=\"LD_PRELOAD=/usr/local/lib/libanyhack.so.1\"" ${RUNF} > ${TMPBAK}
 		restartAgent
 	}
 fi
@@ -46,4 +46,12 @@ if [ -f ${LFILE} ] ; then
 		sed -i 's@^\(Exec=\)\(.*vpnui\)@\1env https_proxy=\\"\\" HTTPS_PROXY=\\"\\" \2@' ${LFILE}
 	}
 fi
+LFILE=/usr/share/applications/com.cisco.anyconnect.gui.desktop
+if [ -f ${LFILE} ] ; then
+	grep -q ^Exec=env ${LFILE} || {
+		[ ! -f ${LFILE}.sav ] && cp ${LFILE} ${LFILE}.sav
+		sed -i 's@^\(Exec=\)\(.*vpnui\)@\1env https_proxy=\\"\\" HTTPS_PROXY=\\"\\" http_proxy=\\"\\" HTTP_PROXY=\\"\\" \2@' ${LFILE}
+	}
+fi
+
 exit 0

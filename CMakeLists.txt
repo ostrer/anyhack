@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.9)
 
-project(anyhack VERSION 0.2.1 DESCRIPTION "AnyConnect LAN hack")
+project(anyhack VERSION 1.3.0 DESCRIPTION "AnyConnect LAN hack")
 
 
 file(GLOB SOURCES src/*.c*)
@@ -11,7 +11,7 @@ target_include_directories(anyhack PRIVATE include)
 target_include_directories(anyhack PRIVATE src)
 
 SET(CMAKE_INSTALL_PREFIX /)
-INSTALL(TARGETS anyhack LIBRARY DESTINATION opt/cisco/anyconnect/lib NAMELINK_SKIP)
+INSTALL(TARGETS anyhack LIBRARY DESTINATION usr/local/lib NAMELINK_SKIP)
 INSTALL(PROGRAMS scripts/anyhack scripts/anyhack.patch.vpn DESTINATION usr/local/bin)
 
 # copy script as postinst for deb package
